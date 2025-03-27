@@ -21,7 +21,7 @@ const RegisterPage = () => {
       ...values,
       username: values.email,
       name: values.firstName,
-      role: "ADMIN",
+      role: "USER",
     };
     axios
       .post("http://localhost:8080/api/auth/register", values)
