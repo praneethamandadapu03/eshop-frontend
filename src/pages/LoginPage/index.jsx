@@ -3,15 +3,46 @@ import axios from "axios";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import styles from "./styles.css";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+
+  const navigate = useNavigate();
+
+  const [requstResponse, setRequestRespose] = useState({
+    message: "",
+    alertClassName: "",
+  });
   const initialValues = {
     email: "",
     password: "",
   };
 
   const onSubmit = (values) => {
-    console.log(values);
+    values = {
+      ...values,
+      usernameOrEmail: values.email
+    };
+    axios
+      .post("http://localhost:8080/api/auth/login", values)
+      .then(
+        (response) => {
+          setRequestRespose({
+            message: "user login successfully",
+            alertClassName: "alert alert-success",
+          });
+          localStorage.setItem("token", response.data);
+          navigate("/");
+        },
+        (error) => {
+          console.log(error);
+          setRequestRespose({
+            message: 'Invalid email or password',
+            alertClassName: "alert alert-danger",
+          });
+        }
+      )
+      .catch((error) => console.log(error));
   };
 
   const validationSchema = Yup.object({
@@ -29,7 +60,10 @@ const LoginPage = () => {
         <div className="col-md-3"></div>
         <div className="col-md-6">
           <div className={styles.wrapper}>
-            <h2>LoginPage</h2>
+            <div class={requstResponse.alertClassName} role="alert">
+              {requstResponse.message}
+            </div>
+            <h2>Login</h2>
             <hr />
             <Formik
               initialValues={initialValues}
